@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Get Data Example</title>
+  </head>
+  <body>
+    <label for="input">Get todo by ID:</label>
+    <input type="text" id="input">
+    <button id="submit">Submit</button>
+
+    <hr>
+
+    <h2>Results:</h2>
+    <p id="output"></p>
+
+    <script>
+      const inputElement = document.getElementById("input");
+      const outputElement = document.getElementById("output");
+      const submitButton = document.getElementById("submit");
+
+      function getData() {
+        const inputValue = inputElement.value;
+        
+        // You can replace the API URL with your own API endpoint
+        const apiUrl = `http://localhost:8080/api/todo/${inputValue}`;
+
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+            outputElement.textContent = "description: " + data["description"] + "\r\n" + "dueDate: " + data["dueDate"] + "\r\n" + "status: " + data["status"] + "\r\n" + "owner: " + data["owner"] + "\r\n" + "priority: " + data["priority"];
+          })
+          .catch(error => {
+            outputElement.textContent = "Error retrieving data";
+            console.error(error);
+          });
+      }
+
+      submitButton.addEventListener("click", getData);
+    </script>
+  </body>
+</html>
