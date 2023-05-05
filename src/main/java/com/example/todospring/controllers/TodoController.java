@@ -2,20 +2,11 @@ package com.example.todospring.controllers;
 
 import com.example.todospring.entity.Todo;
 import com.example.todospring.service.TodoService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.net.URI;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
-
 
 @RestController
 public class TodoController {
@@ -23,6 +14,7 @@ public class TodoController {
     @Autowired
     private TodoService todoService;
 
+    @CrossOrigin
     @PostMapping("/api/todo")
     public Todo createToDo(@RequestBody() Todo toDoRequest){
         Todo todo = new Todo();
@@ -35,29 +27,38 @@ public class TodoController {
         return todo;
     }
 
+    @CrossOrigin
     @GetMapping("/api/todo")
-    public List<Todo> getAllToDos(){
+    public List<Todo> getAllToDos() {
         List<Todo> allToDos = todoService.findAllToDos();
         return allToDos;
     }
 
+    @CrossOrigin
     @GetMapping("/api/todo/{id}")
-    public Todo getToDo(@PathVariable Long id){
-        Todo todo = todoService.findSingleToDo(id).orElseThrow(
-                () -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "entity not found"
-            )
-        );
-        
-        return todo;
+    public ResponseEntity<Todo> getToDo(@PathVariable Long id){
+        Optional<Todo> todo = todoService.findSingleToDo(id);
+
+        if (todo.isPresent()) {
+            return ResponseEntity.ok(todo.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    @CrossOrigin
     @PutMapping("/api/todo/{id}")
-    public Todo updateToDo(@PathVariable Long id, @RequestBody Todo toDoRequest){
+    public ResponseEntity<Todo> updateToDo(@PathVariable Long id, @RequestBody Todo toDoRequest){
         Todo updatedToDo = todoService.updateToDo(id, toDoRequest);
-        return updatedToDo;
+        if (updatedToDo != null){
+            return ResponseEntity.ok(updatedToDo);
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    @CrossOrigin
     @DeleteMapping("/api/todo/{id}")
     public void deleteToDo(@PathVariable Long id){
         todoService.deleteToDo(id);
